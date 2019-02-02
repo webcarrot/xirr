@@ -1,4 +1,4 @@
-# @webcarrot/xirr &middot; [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/webcarrot/xirr/blob/master/LICENSE) [![npm version](https://img.shields.io/npm/v/proto-polyfill.svg?style=flat)](https://www.npmjs.com/package/xirr)
+# @webcarrot/xirr &middot; [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/webcarrot/xirr/blob/master/LICENSE) [![npm version](https://img.shields.io/npm/v/@webcarrot/xirr.svg?style=flat)](https://www.npmjs.com/package/xirr)
 
 JavaScript implementation of LibreOffice XIRR function
 
