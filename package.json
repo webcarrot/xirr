@@ -1,0 +1,32 @@
+{
+  "name": "@webcarrot/xirr",
+  "version": "1.0.0",
+  "description": "JavaScript implementation of LibreOffice XIRR function",
+  "main": "cjs/index",
+  "module": "esm/index",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/webcarrot/xirr.git"
+  },
+  "keywords": [
+    "xirr"
+  ],
+  "scripts": {
+    "make:mjs": "cp ./esm/index.js ./esm/index.mjs",
+    "build:esm": "tsc --sourceMap -d -t es6 --outDir ./esm ./index.ts",
+    "build:cjs": "tsc --sourceMap -d -t es5 --lib es6 --outDir ./cjs ./index.ts",
+    "build": "npm run build:esm && npm run build:cjs && npm run make:mjs"
+  },
+  "author": {
+    "email": "admin@webcarrot.pl",
+    "name": "webcarrot"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/webcarrot/xirr/issues"
+  },
+  "homepage": "https://github.com/webcarrot/xirr#readme",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
+  }
+}
