@@ -1,21 +1,20 @@
 export type CashFlow = {
-  amount: number;
-  date: Date;
+  readonly amount: number;
+  readonly date: Date;
 };
 
 export type CashFlowNormalized = {
-  amount: number;
-  date: number;
+  readonly amount: number;
+  readonly date: number;
 };
 
 export const calculateResult = (
-  firtsFlow: CashFlowNormalized,
   flowsFrom1: ReadonlyArray<CashFlowNormalized>,
   r: number
 ): number =>
   flowsFrom1.reduce<number>(
     (result, { date, amount }) => result + amount / Math.pow(r, date),
-    firtsFlow.amount
+    0.0
   );
 
 export const calculateResultDerivation = (
@@ -36,28 +35,28 @@ export const calculate = (
   maxIterations: number = 20
 ): number => {
   if (flows.findIndex(({ amount }) => amount > 0) === -1) {
-    throw new Error("No positive amount in cash flows");
+    throw new RangeError("No positive amount was found in cash flows");
   }
   if (flows.findIndex(({ amount }) => amount < 0) === -1) {
-    throw new Error("No negative amount in cash flows");
+    throw new RangeError("No negative amount was found in cash flows");
   }
   if (guessRate <= -1) {
-    throw new Error("Guess rate lower than -1");
+    throw new RangeError("Guess rate is less than or equal to -1");
   }
-  if (maxEpsilon < 0) {
-    throw new Error("Max epsilon lower than 0");
+  if (maxEpsilon <= 0) {
+    throw new RangeError("Max epsilon is less than or equal to 0");
   }
   if (maxScans < 10) {
-    throw new Error("Max scans lower than 10");
+    throw new RangeError("Max scans is lower than 10");
   }
   if (maxIterations < 10) {
-    throw new Error("Max iterations lower than 10");
+    throw new RangeError("Max iterations is lower than 10");
   }
   let resultRate = guessRate;
   let resultValue: number;
   let iterationScan: number = 0;
   let doLoop: boolean = false;
-  const firstFlow = flows[0];
+  const firstFlowAmount = flows[0].amount;
   const flowsFrom1 = flows.slice(1);
   do {
     if (iterationScan >= 1) {
@@ -65,7 +64,8 @@ export const calculate = (
     }
     let iteration: number = maxIterations;
     do {
-      resultValue = calculateResult(firstFlow, flowsFrom1, resultRate + 1);
+      resultValue =
+        firstFlowAmount + calculateResult(flowsFrom1, resultRate + 1);
       const newRate: number =
         resultRate -
         resultValue / calculateResultDerivation(flowsFrom1, resultRate + 1);
@@ -91,18 +91,18 @@ export const calculate = (
 const D_N = 365.0 * 86400000;
 
 export const normalize = (
-  cashflows: ReadonlyArray<CashFlow>
+  flows: ReadonlyArray<CashFlow>
 ): ReadonlyArray<CashFlowNormalized> => {
-  const cashflowsS = cashflows
+  const flowsN = flows
     .map<CashFlowNormalized>(({ amount, date }) => ({
       amount,
       date: date.getTime()
     }))
     .sort((a, b) => a.date - b.date);
-  const first: number = cashflowsS[0].date;
-  return cashflowsS.map<CashFlowNormalized>(({ amount, date }) => ({
+  const firstDate: number = flowsN[0].date;
+  return flowsN.map<CashFlowNormalized>(({ amount, date }) => ({
     amount,
-    date: (date - first) / D_N
+    date: (date - firstDate) / D_N
   }));
 };
 

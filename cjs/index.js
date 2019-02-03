@@ -1,10 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.calculateResult = function (firtsFlow, flowsFrom1, r) {
+exports.calculateResult = function (flowsFrom1, r) {
     return flowsFrom1.reduce(function (result, _a) {
         var date = _a.date, amount = _a.amount;
         return result + amount / Math.pow(r, date);
-    }, firtsFlow.amount);
+    }, 0.0);
 };
 exports.calculateResultDerivation = function (flowsFrom1, r) {
     return flowsFrom1.reduce(function (result, _a) {
@@ -21,31 +21,31 @@ exports.calculate = function (flows, guessRate, maxEpsilon, maxScans, maxIterati
         var amount = _a.amount;
         return amount > 0;
     }) === -1) {
-        throw new Error("No positive amount in cash flows");
+        throw new RangeError("No positive amount was found in cash flows");
     }
     if (flows.findIndex(function (_a) {
         var amount = _a.amount;
         return amount < 0;
     }) === -1) {
-        throw new Error("No negative amount in cash flows");
+        throw new RangeError("No negative amount was found in cash flows");
     }
     if (guessRate <= -1) {
-        throw new Error("Guess rate lower than -1");
+        throw new RangeError("Guess rate is less than or equal to -1");
     }
-    if (maxEpsilon < 0) {
-        throw new Error("Max epsilon lower than 0");
+    if (maxEpsilon <= 0) {
+        throw new RangeError("Max epsilon is less than or equal to 0");
     }
     if (maxScans < 10) {
-        throw new Error("Max scans lower than 10");
+        throw new RangeError("Max scans is lower than 10");
     }
     if (maxIterations < 10) {
-        throw new Error("Max iterations lower than 10");
+        throw new RangeError("Max iterations is lower than 10");
     }
     var resultRate = guessRate;
     var resultValue;
     var iterationScan = 0;
     var doLoop = false;
-    var firstFlow = flows[0];
+    var firstFlowAmount = flows[0].amount;
     var flowsFrom1 = flows.slice(1);
     do {
         if (iterationScan >= 1) {
@@ -53,7 +53,8 @@ exports.calculate = function (flows, guessRate, maxEpsilon, maxScans, maxIterati
         }
         var iteration = maxIterations;
         do {
-            resultValue = exports.calculateResult(firstFlow, flowsFrom1, resultRate + 1);
+            resultValue =
+                firstFlowAmount + exports.calculateResult(flowsFrom1, resultRate + 1);
             var newRate = resultRate -
                 resultValue / exports.calculateResultDerivation(flowsFrom1, resultRate + 1);
             var rateEpsilon = Math.abs(newRate - resultRate);
@@ -73,8 +74,8 @@ exports.calculate = function (flows, guessRate, maxEpsilon, maxScans, maxIterati
     return resultRate;
 };
 var D_N = 365.0 * 86400000;
-exports.normalize = function (cashflows) {
-    var cashflowsS = cashflows
+exports.normalize = function (flows) {
+    var flowsN = flows
         .map(function (_a) {
         var amount = _a.amount, date = _a.date;
         return ({
@@ -83,12 +84,12 @@ exports.normalize = function (cashflows) {
         });
     })
         .sort(function (a, b) { return a.date - b.date; });
-    var first = cashflowsS[0].date;
-    return cashflowsS.map(function (_a) {
+    var firstDate = flowsN[0].date;
+    return flowsN.map(function (_a) {
         var amount = _a.amount, date = _a.date;
         return ({
             amount: amount,
-            date: (date - first) / D_N
+            date: (date - firstDate) / D_N
         });
     });
 };

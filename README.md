@@ -1,6 +1,7 @@
 # @webcarrot/xirr &middot; [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/webcarrot/xirr/blob/master/LICENSE) [![npm version](https://img.shields.io/npm/v/@webcarrot/xirr.svg?style=flat)](https://www.npmjs.com/package/@webcarrot/xirr)
 
-JavaScript implementation of LibreOffice XIRR function
+JavaScript implementation of the XIRR LibreOffice function.
+It should give the same results as equivalents from LibreOffice Calc, MS Excel, Google Spreadsheet etc.
 
 ## Instalation
 
@@ -29,19 +30,18 @@ try {
 }
 ```
 
-## API
+## Methods and types
 
 ```typescript
 export declare type CashFlow = {
-  amount: number;
-  date: Date;
+  readonly amount: number;
+  readonly date: Date;
 };
 export declare type CashFlowNormalized = {
-  amount: number;
-  date: number;
+  readonly amount: number;
+  readonly date: number;
 };
 export declare const calculateResult: (
-  firtsFlow: CashFlowNormalized,
   flowsFrom1: ReadonlyArray<CashFlowNormalized>,
   r: number
 ) => number;
@@ -57,7 +57,7 @@ export declare const calculate: (
   maxIterations?: number
 ) => number;
 export declare const normalize: (
-  cashflows: ReadonlyArray<CashFlow>
+  flows: ReadonlyArray<CashFlow>
 ) => ReadonlyArray<CashFlowNormalized>;
 export declare const xirr: (
   flows: ReadonlyArray<CashFlow>,
