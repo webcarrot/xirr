@@ -1,6 +1,6 @@
 {
   "name": "@webcarrot/xirr",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "JavaScript implementation of the XIRR LibreOffice Calc function.",
   "main": "cjs/index",
   "module": "esm/index",
