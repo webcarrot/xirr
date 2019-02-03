@@ -41,11 +41,12 @@ export declare type CashFlowNormalized = {
   date: number;
 };
 export declare const calculateResult: (
-  flows: ReadonlyArray<CashFlowNormalized>,
+  firtsFlow: CashFlowNormalized,
+  flowsFrom1: ReadonlyArray<CashFlowNormalized>,
   r: number
 ) => number;
 export declare const calculateResultDerivation: (
-  flows: ReadonlyArray<CashFlowNormalized>,
+  flowsFrom1: ReadonlyArray<CashFlowNormalized>,
   r: number
 ) => number;
 export declare const calculate: (

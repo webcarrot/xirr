@@ -1,17 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.calculateResult = function (flows, r) {
-    return flows
-        .slice(1)
-        .reduce(function (result, _a) {
+exports.calculateResult = function (firtsFlow, flowsFrom1, r) {
+    return flowsFrom1.reduce(function (result, _a) {
         var date = _a.date, amount = _a.amount;
         return result + amount / Math.pow(r, date);
-    }, flows[0].amount);
+    }, firtsFlow.amount);
 };
-exports.calculateResultDerivation = function (flows, r) {
-    return flows
-        .slice(1)
-        .reduce(function (result, _a) {
+exports.calculateResultDerivation = function (flowsFrom1, r) {
+    return flowsFrom1.reduce(function (result, _a) {
         var date = _a.date, amount = _a.amount;
         return result - (date * amount) / Math.pow(r, date + 1.0);
     }, 0.0);
@@ -49,15 +45,17 @@ exports.calculate = function (flows, guessRate, maxEpsilon, maxScans, maxIterati
     var resultValue;
     var iterationScan = 0;
     var doLoop = false;
+    var firstFlow = flows[0];
+    var flowsFrom1 = flows.slice(1);
     do {
         if (iterationScan >= 1) {
             resultRate = -0.99 + (iterationScan - 1) * 0.01;
         }
         var iteration = maxIterations;
         do {
-            resultValue = exports.calculateResult(flows, resultRate + 1);
+            resultValue = exports.calculateResult(firstFlow, flowsFrom1, resultRate + 1);
             var newRate = resultRate -
-                resultValue / exports.calculateResultDerivation(flows, resultRate + 1);
+                resultValue / exports.calculateResultDerivation(flowsFrom1, resultRate + 1);
             var rateEpsilon = Math.abs(newRate - resultRate);
             resultRate = newRate;
             doLoop = rateEpsilon > maxEpsilon && Math.abs(resultValue) > maxEpsilon;

@@ -9,27 +9,24 @@ export type CashFlowNormalized = {
 };
 
 export const calculateResult = (
-  flows: ReadonlyArray<CashFlowNormalized>,
+  firtsFlow: CashFlowNormalized,
+  flowsFrom1: ReadonlyArray<CashFlowNormalized>,
   r: number
 ): number =>
-  flows
-    .slice(1)
-    .reduce<number>(
-      (result, { date, amount }) => result + amount / Math.pow(r, date),
-      flows[0].amount
-    );
+  flowsFrom1.reduce<number>(
+    (result, { date, amount }) => result + amount / Math.pow(r, date),
+    firtsFlow.amount
+  );
 
 export const calculateResultDerivation = (
-  flows: ReadonlyArray<CashFlowNormalized>,
+  flowsFrom1: ReadonlyArray<CashFlowNormalized>,
   r: number
 ): number =>
-  flows
-    .slice(1)
-    .reduce<number>(
-      (result, { date, amount }) =>
-        result - (date * amount) / Math.pow(r, date + 1.0),
-      0.0
-    );
+  flowsFrom1.reduce<number>(
+    (result, { date, amount }) =>
+      result - (date * amount) / Math.pow(r, date + 1.0),
+    0.0
+  );
 
 export const calculate = (
   flows: ReadonlyArray<CashFlowNormalized>,
@@ -60,16 +57,18 @@ export const calculate = (
   let resultValue: number;
   let iterationScan: number = 0;
   let doLoop: boolean = false;
+  const firstFlow = flows[0];
+  const flowsFrom1 = flows.slice(1);
   do {
     if (iterationScan >= 1) {
       resultRate = -0.99 + (iterationScan - 1) * 0.01;
     }
     let iteration: number = maxIterations;
     do {
-      resultValue = calculateResult(flows, resultRate + 1);
+      resultValue = calculateResult(firstFlow, flowsFrom1, resultRate + 1);
       const newRate: number =
         resultRate -
-        resultValue / calculateResultDerivation(flows, resultRate + 1);
+        resultValue / calculateResultDerivation(flowsFrom1, resultRate + 1);
       const rateEpsilon: number = Math.abs(newRate - resultRate);
       resultRate = newRate;
       doLoop = rateEpsilon > maxEpsilon && Math.abs(resultValue) > maxEpsilon;

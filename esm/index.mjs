@@ -1,9 +1,5 @@
-export const calculateResult = (flows, r) => flows
-    .slice(1)
-    .reduce((result, { date, amount }) => result + amount / Math.pow(r, date), flows[0].amount);
-export const calculateResultDerivation = (flows, r) => flows
-    .slice(1)
-    .reduce((result, { date, amount }) => result - (date * amount) / Math.pow(r, date + 1.0), 0.0);
+export const calculateResult = (firtsFlow, flowsFrom1, r) => flowsFrom1.reduce((result, { date, amount }) => result + amount / Math.pow(r, date), firtsFlow.amount);
+export const calculateResultDerivation = (flowsFrom1, r) => flowsFrom1.reduce((result, { date, amount }) => result - (date * amount) / Math.pow(r, date + 1.0), 0.0);
 export const calculate = (flows, guessRate = 0.1, maxEpsilon = 1e-10, maxScans = 200, maxIterations = 20) => {
     if (flows.findIndex(({ amount }) => amount > 0) === -1) {
         throw new Error("No positive amount in cash flows");
@@ -27,15 +23,17 @@ export const calculate = (flows, guessRate = 0.1, maxEpsilon = 1e-10, maxScans =
     let resultValue;
     let iterationScan = 0;
     let doLoop = false;
+    const firstFlow = flows[0];
+    const flowsFrom1 = flows.slice(1);
     do {
         if (iterationScan >= 1) {
             resultRate = -0.99 + (iterationScan - 1) * 0.01;
         }
         let iteration = maxIterations;
         do {
-            resultValue = calculateResult(flows, resultRate + 1);
+            resultValue = calculateResult(firstFlow, flowsFrom1, resultRate + 1);
             const newRate = resultRate -
-                resultValue / calculateResultDerivation(flows, resultRate + 1);
+                resultValue / calculateResultDerivation(flowsFrom1, resultRate + 1);
             const rateEpsilon = Math.abs(newRate - resultRate);
             resultRate = newRate;
             doLoop = rateEpsilon > maxEpsilon && Math.abs(resultValue) > maxEpsilon;
