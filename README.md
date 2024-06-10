@@ -15,12 +15,12 @@ import { xirr, CashFlow } from "@webcarrot/xirr";
 const flows: Array<CashFlow> = [
   {
     amount: 100,
-    date: new Date("2019-02-02")
+    date: new Date("2019-02-02"),
   },
   {
     amount: -120,
-    date: new Date("2019-03-02")
-  }
+    date: new Date("2019-03-02"),
+  },
 ];
 
 try {
@@ -32,38 +32,16 @@ try {
 
 ## Methods and types
 
-```typescript
-export declare type CashFlow = {
+```ts
+export type CashFlow = {
   readonly amount: number;
   readonly date: Date;
 };
-export declare type CashFlowNormalized = {
-  readonly amount: number;
-  readonly date: number;
-};
-export declare const calculateResult: (
-  flowsFrom1: ReadonlyArray<CashFlowNormalized>,
-  r: number
-) => number;
-export declare const calculateResultDerivation: (
-  flowsFrom1: ReadonlyArray<CashFlowNormalized>,
-  r: number
-) => number;
-export declare const calculate: (
-  flows: ReadonlyArray<CashFlowNormalized>,
-  guessRate?: number,
-  maxEpsilon?: number,
-  maxScans?: number,
-  maxIterations?: number
-) => number;
-export declare const normalize: (
-  flows: ReadonlyArray<CashFlow>
-) => ReadonlyArray<CashFlowNormalized>;
-export declare const xirr: (
+export declare function xirr(
   flows: ReadonlyArray<CashFlow>,
   guessRate?: number,
   maxEpsilon?: number,
   maxScans?: number,
   maxIterations?: number
-) => number;
+): number;
 ```
