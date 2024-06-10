@@ -1,43 +1,77 @@
+/**
+ * Record representing cash flow
+ *
+ * @example
+ * ```ts
+ * {
+ *   amount: 100,
+ *   date: new Date("2019-02-02")
+ * }
+ * ```
+ */
 export type CashFlow = {
   readonly amount: number;
   readonly date: Date;
 };
 
+/**
+ * @deprecated Should be internal
+ */
 export type CashFlowNormalized = {
   readonly amount: number;
   readonly date: number;
 };
 
-export const calculateResult = (
+/**
+ * @deprecated Should be internal
+ */
+export function calculateResult(
   flowsFrom1: ReadonlyArray<CashFlowNormalized>,
   r: number
-): number =>
-  flowsFrom1.reduce<number>(
-    (result, { date, amount }) => result + amount / Math.pow(r, date),
-    0.0
-  );
+): number {
+  let result = 0.0;
+  for (let { date, amount } of flowsFrom1) {
+    result = result + amount / Math.pow(r, date);
+  }
+  return result;
+}
 
-export const calculateResultDerivation = (
+/**
+ * @deprecated Should be internal
+ */
+export function calculateResultDerivation(
   flowsFrom1: ReadonlyArray<CashFlowNormalized>,
   r: number
-): number =>
-  flowsFrom1.reduce<number>(
-    (result, { date, amount }) =>
-      result - (date * amount) / Math.pow(r, date + 1.0),
-    0.0
-  );
+): number {
+  let result = 0.0;
+  for (let { date, amount } of flowsFrom1) {
+    result = result - (date * amount) / Math.pow(r, date + 1.0);
+  }
+  return result;
+}
 
-export const calculate = (
+function flowGt0({ amount }: CashFlowNormalized): boolean {
+  return amount > 0;
+}
+
+function flowLt0({ amount }: CashFlowNormalized): boolean {
+  return amount < 0;
+}
+
+/**
+ * @deprecated Should be internal
+ */
+export function calculate(
   flows: ReadonlyArray<CashFlowNormalized>,
   guessRate: number = 0.1,
   maxEpsilon: number = 1e-10,
   maxScans: number = 200,
   maxIterations: number = 20
-): number => {
-  if (flows.findIndex(({ amount }) => amount > 0) === -1) {
+): number {
+  if (flows.findIndex(flowGt0) === -1) {
     throw new RangeError("No positive amount was found in cash flows");
   }
-  if (flows.findIndex(({ amount }) => amount < 0) === -1) {
+  if (flows.findIndex(flowLt0) === -1) {
     throw new RangeError("No negative amount was found in cash flows");
   }
   if (guessRate <= -1) {
@@ -86,31 +120,57 @@ export const calculate = (
     );
   }
   return resultRate;
-};
+}
 
 const D_N = 365.0 * 86400000;
 
-export const normalize = (
+function normalizeCashFlow({ amount, date }: CashFlow): CashFlowNormalized {
+  return {
+    amount,
+    date: date.getTime(),
+  };
+}
+
+function sortCashFlows(
+  { date: a }: CashFlowNormalized,
+  { date: b }: CashFlowNormalized
+): number {
+  return a - b;
+}
+
+/**
+ * @deprecated Should be internal
+ */
+export function normalize(
   flows: ReadonlyArray<CashFlow>
-): ReadonlyArray<CashFlowNormalized> => {
+): ReadonlyArray<CashFlowNormalized> {
   const flowsN = flows
-    .map<CashFlowNormalized>(({ amount, date }) => ({
-      amount,
-      date: date.getTime()
-    }))
-    .sort((a, b) => a.date - b.date);
+    .map<CashFlowNormalized>(normalizeCashFlow)
+    .sort(sortCashFlows);
   const firstDate: number = flowsN[0].date;
   return flowsN.map<CashFlowNormalized>(({ amount, date }) => ({
     amount,
-    date: (date - firstDate) / D_N
+    date: (date - firstDate) / D_N,
   }));
-};
+}
 
-export const xirr = (
+/**
+ * Calculates the internal rate of return for a series of future cash flows that do not need to be periodic
+ */
+export function xirr(
   flows: ReadonlyArray<CashFlow>,
   guessRate?: number,
   maxEpsilon?: number,
   maxScans?: number,
   maxIterations?: number
-): number =>
-  calculate(normalize(flows), guessRate, maxEpsilon, maxScans, maxIterations);
+): number {
+  return calculate(
+    normalize(flows),
+    guessRate,
+    maxEpsilon,
+    maxScans,
+    maxIterations
+  );
+}
+
+export default xirr;
