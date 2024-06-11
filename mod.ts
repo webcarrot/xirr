@@ -14,18 +14,12 @@ export type CashFlow = {
   readonly date: Date;
 };
 
-/**
- * @deprecated Should be internal
- */
-export type CashFlowNormalized = {
+type CashFlowNormalized = {
   readonly amount: number;
   readonly date: number;
 };
 
-/**
- * @deprecated Should be internal
- */
-export function calculateResult(
+function calculateResult(
   flowsFrom1: ReadonlyArray<CashFlowNormalized>,
   r: number
 ): number {
@@ -36,10 +30,7 @@ export function calculateResult(
   return result;
 }
 
-/**
- * @deprecated Should be internal
- */
-export function calculateResultDerivation(
+function calculateResultDerivation(
   flowsFrom1: ReadonlyArray<CashFlowNormalized>,
   r: number
 ): number {
@@ -58,10 +49,7 @@ function flowLt0({ amount }: CashFlowNormalized): boolean {
   return amount < 0;
 }
 
-/**
- * @deprecated Should be internal
- */
-export function calculate(
+function calculate(
   flows: ReadonlyArray<CashFlowNormalized>,
   guessRate: number = 0.1,
   maxEpsilon: number = 1e-10,
@@ -138,10 +126,7 @@ function sortCashFlows(
   return a - b;
 }
 
-/**
- * @deprecated Should be internal
- */
-export function normalize(
+function normalize(
   flows: ReadonlyArray<CashFlow>
 ): ReadonlyArray<CashFlowNormalized> {
   const flowsN = flows
