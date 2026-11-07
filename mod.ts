@@ -21,7 +21,7 @@ type CashFlowNormalized = {
 
 function calculateResult(
   flowsFrom1: ReadonlyArray<CashFlowNormalized>,
-  r: number
+  r: number,
 ): number {
   let result = 0.0;
   for (let { date, amount } of flowsFrom1) {
@@ -32,7 +32,7 @@ function calculateResult(
 
 function calculateResultDerivation(
   flowsFrom1: ReadonlyArray<CashFlowNormalized>,
-  r: number
+  r: number,
 ): number {
   let result = 0.0;
   for (let { date, amount } of flowsFrom1) {
@@ -54,7 +54,7 @@ function calculate(
   guessRate: number = 0.1,
   maxEpsilon: number = 1e-10,
   maxScans: number = 200,
-  maxIterations: number = 20
+  maxIterations: number = 20,
 ): number {
   if (flows.findIndex(flowGt0) === -1) {
     throw new RangeError("No positive amount was found in cash flows");
@@ -78,6 +78,7 @@ function calculate(
   let resultValue: number;
   let iterationScan: number = 0;
   let doLoop: boolean = false;
+  // @ts-ignore We check this
   const firstFlowAmount = flows[0].amount;
   const flowsFrom1 = flows.slice(1);
   do {
@@ -104,7 +105,7 @@ function calculate(
   } while (doLoop && ++iterationScan < maxScans);
   if (doLoop) {
     throw new Error(
-      "XIRR calculation failed. Try to increase one of: max epsilon, max scans, max iterations"
+      "XIRR calculation failed. Try to increase one of: max epsilon, max scans, max iterations",
     );
   }
   return resultRate;
@@ -121,17 +122,18 @@ function normalizeCashFlow({ amount, date }: CashFlow): CashFlowNormalized {
 
 function sortCashFlows(
   { date: a }: CashFlowNormalized,
-  { date: b }: CashFlowNormalized
+  { date: b }: CashFlowNormalized,
 ): number {
   return a - b;
 }
 
 function normalize(
-  flows: ReadonlyArray<CashFlow>
+  flows: ReadonlyArray<CashFlow>,
 ): ReadonlyArray<CashFlowNormalized> {
   const flowsN = flows
     .map<CashFlowNormalized>(normalizeCashFlow)
     .sort(sortCashFlows);
+  // @ts-ignore We check this
   const firstDate: number = flowsN[0].date;
   return flowsN.map<CashFlowNormalized>(({ amount, date }) => ({
     amount,
@@ -147,14 +149,14 @@ export function xirr(
   guessRate?: number,
   maxEpsilon?: number,
   maxScans?: number,
-  maxIterations?: number
+  maxIterations?: number,
 ): number {
   return calculate(
     normalize(flows),
     guessRate,
     maxEpsilon,
     maxScans,
-    maxIterations
+    maxIterations,
   );
 }
 
