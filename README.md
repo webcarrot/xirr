@@ -25,3 +25,9 @@ try {
   console.log(err);
 }
 ```
+
+# Development
+
+Run `npm ci` and then `npm test` to type-check the implementation and run the
+Node.js tests. The tests import TypeScript directly and require Node.js 22.18+
+or a later release with built-in TypeScript type stripping enabled.
