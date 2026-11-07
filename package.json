@@ -32,7 +32,7 @@
     "build:cjs": "tsc --sourceMap -d -t es2022 --module commonjs --outDir ./cjs ./mod.ts",
     "build:cjs:package": "echo '{\"type\": \"commonjs\"}' > ./cjs/package.json",
     "build": "npm run build:esm && npm run build:cjs && npm run build:cjs:package",
-    "test": "tsc -t es2022 --noEmit ./mod.ts"
+    "test": "tsc -t es2022 --noEmit ./mod.ts && node --test mod.test.mjs"
   },
   "author": {
     "email": "admin@webcarrot.pl",
