@@ -101,7 +101,7 @@ function calculate(
       !isFinite(resultRate) ||
       isNaN(resultValue) ||
       !isFinite(resultValue);
-  } while (doLoop && !(++iterationScan < maxScans));
+  } while (doLoop && ++iterationScan < maxScans);
   if (doLoop) {
     throw new Error(
       "XIRR calculation failed. Try to increase one of: max epsilon, max scans, max iterations"
